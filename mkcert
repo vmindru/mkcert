@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# Create SSL certificates
+#
+
+DAYS=730
+CERTPATH=/etc/pki/CA/certs/$1
+
+if [ $# -ne 1  ]; then
+echo "Usage: $0 [host.domain]"
+exit 10
+fi
+
+if [ ! -d $CERTPATH ] 
+        then
+                mkdir $CERTPATH
+fi
+
+
+echo "Certificate for $1"
+
+(
+echo "CZ"
+echo "BRNO"
+echo "BRNO"
+echo "ITLEAD"
+echo "ITLEAD"
+echo $1
+echo "webmaster@$1"
+echo
+echo
+) |
+openssl req -new -nodes -keyout $CERTPATH/$1.key -out $CERTPATH/$1.req -days $DAYS
+openssl ca -policy policy_anything -notext -days $DAYS -out $CERTPATH/$1.crt -infiles $CERTPATH/$1.req
+cat $CERTPATH/$1.key $CERTPATH/$1.crt > $CERTPATH/$1.pem
+chmod 600 $CERTPATH/*
