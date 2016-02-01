@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# Create SSL certificates
+#
+
+DAYS=730
+CERTUSER="$2 $3"
+CERTPATH=/etc/pki/CA/usercerts/$1
+CERTUSEREMAIL="$1"
+
+if [ $# -ne 3  ]; then
+echo "Usage: $0 NAME SURNAME EMAIL e.g. John Doe jdoe@acme.com"
+exit 10
+fi
+
+if [ ! -d $CERTPATH ] 
+        then
+                mkdir $CERTPATH
+fi
+
+
+echo "Certificate for $1"
+
+(
+echo "CZ"
+echo "BRNO"
+echo "BRNO"
+echo "ITLEAD"
+echo "ITLEAD"
+echo "$CERTUSER"
+echo "$CERTUSEREMAIL"
+echo
+echo
+) |
+openssl req -new -nodes -keyout $CERTPATH/$1.key -out $CERTPATH/$1.req -days $DAYS
+openssl ca -policy policy_anything -notext -days $DAYS -out $CERTPATH/$1.crt -infiles $CERTPATH/$1.req
+cat $CERTPATH/$1.key $CERTPATH/$1.crt > $CERTPATH/$1.pem
+chmod 600 $CERTPATH/*
