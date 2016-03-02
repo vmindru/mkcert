@@ -4,18 +4,25 @@
 #
 
 DAYS=730
-CERTPATH=/etc/pki/CA/certs/$1
+if [$# -eq 2] 
+then 
+        CERTPAHT="$2"
+else
+        CERTPATH="./"
+fi
 
-if [ $# -ne 1  ]; then
-echo "Usage: $0 [host.domain]"
+
+if [ $# -ne 2  ] or [ $1 == "help" ] or [ $2 == "--help"] ; then
+echo "Usage: $0 [host.domain] PATH
+     if $2 PATH is not mentioned it will createa cert in ./
+     if $2 PATH is missing, it will be created"
 exit 10
 fi
 
 if [ ! -d $CERTPATH ] 
         then
-                mkdir $CERTPATH
+                mkdir -p $CERTPATH
 fi
-
 
 echo "Certificate for $1"
 
@@ -31,6 +38,4 @@ echo
 echo
 ) |
 openssl req -new -nodes -keyout $CERTPATH/$1.key -out $CERTPATH/$1.req -days $DAYS
-openssl ca -policy policy_anything -notext -days $DAYS -out $CERTPATH/$1.crt -infiles $CERTPATH/$1.req
-cat $CERTPATH/$1.key $CERTPATH/$1.crt > $CERTPATH/$1.pem
-chmod 600 $CERTPATH/*
+
